@@ -70,7 +70,11 @@ class Metronome(var tempo: Float) {
 
     fun setNewTempo(newTempo: Float) {
         println("setting tempo to ${newTempo}")
+        sequencer.stop()
+        resetTrack()
         sequencer.tempoInBPM = newTempo
+        sequencer.start()
+        tempo = newTempo
     }
 
     fun start() {
