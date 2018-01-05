@@ -1,5 +1,6 @@
 package metronome
 
+import com.amcglynn.metronome.CommandLineInput
 import java.util.*
 import javax.sound.midi.MidiSystem
 import javax.sound.midi.Sequence
@@ -9,20 +10,15 @@ val DEFAULT_TEMPO = 60f
 val MIN_TEMPO = 30f
 val MAX_TEMPO = 300f
 
-class CommandLineMetronome {
+class CommandLineMetronome(val metronome: Metronome, val commandLineInput: CommandLineInput,
+                           val testMode: Boolean = false) {
     fun start() {
-        val metronome = Metronome(DEFAULT_TEMPO, MidiSystem.getSequencer(), Sequence(Sequence.PPQ, 4))
-
-        val stdin = Scanner(System.`in`)
-
-        var command: String
-
         println("available commands are start, stop and exit")
 
         do {
             print("Enter command: ")
-            val fullCommand = stdin.nextLine()
-            command = fullCommand.split(" ").get(0)
+            val fullCommand = commandLineInput.readLine()
+            var command = fullCommand.split(" ").get(0)
 
             when(command) {
                 "start" -> {
@@ -59,7 +55,10 @@ class CommandLineMetronome {
             }
         } while (command != "exit")
 
-        exitProcess(0)
+        // this check is here so we don't stop junit from running during a test suite run
+        if(!testMode) {
+            exitProcess(0)
+        }
     }
 
     fun clamp(num: Float, min: Float, max: Float) : Float {
@@ -74,6 +73,7 @@ class CommandLineMetronome {
 }
 
 fun main(args: Array<String>) {
-    CommandLineMetronome().start()
+    val metronome = Metronome(DEFAULT_TEMPO, MidiSystem.getSequencer(), Sequence(Sequence.PPQ, 4))
+    val cliInput = CommandLineInput(Scanner(System.`in`))
+    CommandLineMetronome(metronome, cliInput).start()
 }
-
