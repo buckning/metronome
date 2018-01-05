@@ -1,6 +1,7 @@
 package metronome
 
 import com.amcglynn.metronome.CommandLineInput
+import java.lang.NumberFormatException
 import java.util.*
 import javax.sound.midi.MidiSystem
 import javax.sound.midi.Sequence

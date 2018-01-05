@@ -25,37 +25,36 @@ class MetronomeTest : ClickListener {
     fun setUp() {
         clickListenerUpdated = false
         trackMock = mock<Track>()
+        sequencerMock = mock<Sequencer>()
 
         sequenceMock = mock<Sequence> {
             on { createTrack() } doReturn trackMock
         }
 
-        sequencerMock = mock<Sequencer>()
-
         metronome = Metronome(120f, sequencerMock, sequenceMock)
     }
 
     @Test
-    fun testTempoIsSetInMetronomeInConstructor() {
+    fun `test tempo that is set in metronome constructor is persisted in the class`() {
         assertEquals(120f, metronome.tempo)
     }
 
     @Test
-    fun testSequencerIsStoppedWhenStopIsCalled() {
+    fun `test the sequencer is stopped when the stop method is invoked`() {
         metronome.stop()
         verify(sequencerMock).stop()
         assertEquals(120f, metronome.tempo)
     }
 
     @Test
-    fun testSequencerIsStartedWhenStartIsCalled() {
+    fun `test sequencer is started when the start method is invoked`() {
         metronome.start()
         verify(sequencerMock).start()
         assertEquals(120f, metronome.tempo)
     }
 
     @Test
-    fun testClickListenerUpdatesTheListenerWhenTheSequncerHasUpdated() {
+    fun `test the ClickListener gets updated when the sequencer has updated the tick position`() {
         metronome.addClickListener(this)
         whenever(sequencerMock.tickPosition).thenReturn(0)
 
@@ -70,7 +69,7 @@ class MetronomeTest : ClickListener {
     }
 
     @Test
-    fun testClickListenerDoesNotUpdateTheListenerWhenTheSequncerHasNotUpdated() {
+    fun `test the ClickListener does not get updated when the sequencer does not update the tick position`() {
         metronome.addClickListener(this)
 
         whenever(sequencerMock.tickPosition).thenReturn(0)
@@ -83,7 +82,7 @@ class MetronomeTest : ClickListener {
     }
 
     @Test
-    fun testSetNewTempoResultsInChangeInTempoToSequencer() {
+    fun `test setNewTempo results in the tempo getting updated in the sequencer`() {
         metronome.setNewTempo(60f, sequenceMock)
         verify(sequencerMock).tempoInBPM = 60f
 
