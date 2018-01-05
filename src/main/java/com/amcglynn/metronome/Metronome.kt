@@ -2,9 +2,6 @@ package metronome
 
 import javax.sound.midi.*
 
-val BASS_DRUM = 35
-val SNARE_DRUM = 38
-
 /**
  * Created by amcglynn on 30/12/2017.
  */
@@ -12,21 +9,15 @@ class Metronome(var tempo: Float, val sequencer: Sequencer, val sequence: Sequen
     private var track: Track
     private var metronomeObserver: MetronomeObserver
 
+    val BASS_DRUM = 35
+    val SNARE_DRUM = 38
+
     init {
         sequencer.open()
 
         track = sequence.createTrack()
 
-        track.add(makeEvent(ShortMessage.NOTE_ON, 9, BASS_DRUM, 0))
-        track.add(makeEvent(ShortMessage.NOTE_ON, 9, BASS_DRUM, 8))
-        track.add(makeEvent(ShortMessage.NOTE_ON, 9, BASS_DRUM, 10))
-
-        track.add(makeEvent(ShortMessage.NOTE_ON, 9, SNARE_DRUM, 4))
-        track.add(makeEvent(ShortMessage.NOTE_ON, 9, SNARE_DRUM, 12))
-
-        track.add(makeEvent(ShortMessage.CONTROL_CHANGE, 1, 127, 16))
-        // this is to make sure that it always plays the full bar
-        track.add(makeEvent(ShortMessage.PROGRAM_CHANGE, 9, 1, 15))
+        createTrack(track)
 
         sequencer.setSequence(sequence)
         sequencer.setLoopCount(Sequencer.LOOP_CONTINUOUSLY)
@@ -37,7 +28,13 @@ class Metronome(var tempo: Float, val sequencer: Sequencer, val sequence: Sequen
 
     private fun resetTrack(sequence: Sequence) {
         track = sequence.createTrack()
+        createTrack(track)
 
+        sequencer.setSequence(sequence)
+        sequencer.setLoopCount(Sequencer.LOOP_CONTINUOUSLY)
+    }
+
+    private fun createTrack(track: Track) {
         track.add(makeEvent(ShortMessage.NOTE_ON, 9, BASS_DRUM, 0))
         track.add(makeEvent(ShortMessage.NOTE_ON, 9, BASS_DRUM, 8))
         track.add(makeEvent(ShortMessage.NOTE_ON, 9, BASS_DRUM, 10))
@@ -48,10 +45,6 @@ class Metronome(var tempo: Float, val sequencer: Sequencer, val sequence: Sequen
         track.add(makeEvent(ShortMessage.CONTROL_CHANGE, 1, 127, 16))
         // this is to make sure that it always plays the full bar
         track.add(makeEvent(ShortMessage.PROGRAM_CHANGE, 9, 1, 15))
-
-        sequencer.setSequence(sequence)
-        sequencer.setLoopCount(Sequencer.LOOP_CONTINUOUSLY)
-        sequencer.tempoInBPM = tempo
     }
 
     fun stop() {
@@ -63,7 +56,6 @@ class Metronome(var tempo: Float, val sequencer: Sequencer, val sequence: Sequen
     }
 
     fun setNewTempo(newTempo: Float, sequence: Sequence) {
-        println("setting tempo to ${newTempo}")
         sequencer.stop()
         resetTrack(sequence)
         sequencer.tempoInBPM = newTempo
@@ -72,8 +64,10 @@ class Metronome(var tempo: Float, val sequencer: Sequencer, val sequence: Sequen
     }
 
     fun start() {
+        // need to delete and reset track due to the way that the midi sequencer sounds when starting again
         sequence.deleteTrack(track)
         resetTrack(sequence)
+        sequencer.tempoInBPM = tempo
         sequencer.start()
     }
 
