@@ -8,18 +8,13 @@ val SNARE_DRUM = 38
 /**
  * Created by amcglynn on 30/12/2017.
  */
-class Metronome(var tempo: Float) {
-    private var sequencer: Sequencer
+class Metronome(var tempo: Float, val sequencer: Sequencer, val sequence: Sequence) {
     private var track: Track
-    private var sequence: Sequence
     private var metronomeObserver: MetronomeObserver
 
     init {
-        sequencer = MidiSystem.getSequencer()
-
         sequencer.open()
 
-        sequence = Sequence(Sequence.PPQ, 4)
         track = sequence.createTrack()
 
         track.add(makeEvent(ShortMessage.NOTE_ON, 9, BASS_DRUM, 0))
@@ -40,8 +35,7 @@ class Metronome(var tempo: Float) {
         metronomeObserver = MetronomeObserver(sequencer)
     }
 
-    private fun resetTrack() {
-        sequence = Sequence(Sequence.PPQ, 4)
+    private fun resetTrack(sequence: Sequence) {
         track = sequence.createTrack()
 
         track.add(makeEvent(ShortMessage.NOTE_ON, 9, BASS_DRUM, 0))
@@ -68,10 +62,10 @@ class Metronome(var tempo: Float) {
         sequencer.close()
     }
 
-    fun setNewTempo(newTempo: Float) {
+    fun setNewTempo(newTempo: Float, sequence: Sequence) {
         println("setting tempo to ${newTempo}")
         sequencer.stop()
-        resetTrack()
+        resetTrack(sequence)
         sequencer.tempoInBPM = newTempo
         sequencer.start()
         tempo = newTempo
@@ -79,7 +73,7 @@ class Metronome(var tempo: Float) {
 
     fun start() {
         sequence.deleteTrack(track)
-        resetTrack()
+        resetTrack(sequence)
         sequencer.start()
     }
 

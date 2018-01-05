@@ -1,6 +1,8 @@
 package metronome
 
 import java.util.*
+import javax.sound.midi.MidiSystem
+import javax.sound.midi.Sequence
 import kotlin.system.exitProcess
 
 val DEFAULT_TEMPO = 60f
@@ -9,7 +11,7 @@ val MAX_TEMPO = 300f
 
 class CommandLineMetronome {
     fun start() {
-        val metronome = Metronome(DEFAULT_TEMPO)
+        val metronome = Metronome(DEFAULT_TEMPO, MidiSystem.getSequencer(), Sequence(Sequence.PPQ, 4))
 
         val stdin = Scanner(System.`in`)
 
@@ -36,7 +38,7 @@ class CommandLineMetronome {
                         val tempo = fullCommand.split(" ").get(1)
                         try {
                             val tempoFloat = tempo.toFloat()
-                            metronome.setNewTempo(clamp(tempoFloat, MIN_TEMPO, MAX_TEMPO))
+                            metronome.setNewTempo(clamp(tempoFloat, MIN_TEMPO, MAX_TEMPO), Sequence(Sequence.PPQ, 4))
                         } catch (e: NumberFormatException) {
                             println("You must enter tempo followed by the desired tempo.\n " +
                                     "e.g.\ntempo 120")
