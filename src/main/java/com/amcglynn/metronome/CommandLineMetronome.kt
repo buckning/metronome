@@ -14,7 +14,10 @@ val MAX_TEMPO = 300f
 class CommandLineMetronome(val metronome: Metronome, val commandLineInput: CommandLineInput,
                            val testMode: Boolean = false) {
     fun start() {
-        println("available commands are start, stop and exit")
+        val instructions = "available commands are: \n\tstart \n\tstop \n\ttempo <new tempo> " +
+                "\n\texit\n\nNote: tempo must be between 30 and 300"
+
+        println(instructions)
 
         do {
             print("Enter command: ")
@@ -23,35 +26,19 @@ class CommandLineMetronome(val metronome: Metronome, val commandLineInput: Comma
 
             when(command) {
                 "start" -> {
-                    println("Starting...")
-                    metronome.start()
+                    doStart()
                 }
                 "stop" -> {
-                    println("Stopping...")
-                    metronome.stop()
+                    doStop()
                 }
                 "tempo" -> {
-                    if(fullCommand.split(" ").size == 2) {
-                        val tempo = fullCommand.split(" ").get(1)
-                        try {
-                            val tempoFloat = tempo.toFloat()
-                            metronome.setNewTempo(clamp(tempoFloat, MIN_TEMPO, MAX_TEMPO), Sequence(Sequence.PPQ, 4))
-                        } catch (e: NumberFormatException) {
-                            println("You must enter tempo followed by the desired tempo.\n " +
-                                    "e.g.\ntempo 120")
-                        }
-                    } else {
-                        println("You must enter tempo followed by the desired tempo.\n " +
-                                "e.g.\ntempo 120")
-                    }
+                    doTempoChange(fullCommand)
                 }
                 "exit" -> {
-                    println("Exiting...")
-                    metronome.stop()
-                    metronome.close()
+                    doExit()
                 }
                 else -> {
-                    println("Command not found, available commands are start, stop and exit")
+                    println("Command not found, ${instructions}")
                 }
             }
         } while (command != "exit")
@@ -60,6 +47,39 @@ class CommandLineMetronome(val metronome: Metronome, val commandLineInput: Comma
         if(!testMode) {
             exitProcess(0)
         }
+    }
+
+    fun doStart() {
+        println("Starting...")
+        metronome.start()
+    }
+
+    fun doStop() {
+        println("Stopping...")
+        metronome.stop()
+    }
+
+    fun doTempoChange(fullCommand: String) {
+        val tempoChangeInstructions = "You must enter tempo followed by the desired tempo.\n " +
+                "e.g.\ntempo 120"
+
+        if(fullCommand.split(" ").size == 2) {
+            val tempo = fullCommand.split(" ").get(1)
+            try {
+                val tempoFloat = tempo.toFloat()
+                metronome.setNewTempo(clamp(tempoFloat, MIN_TEMPO, MAX_TEMPO), Sequence(Sequence.PPQ, 4))
+            } catch (e: NumberFormatException) {
+                println(tempoChangeInstructions)
+            }
+        } else {
+            println(tempoChangeInstructions)
+        }
+    }
+
+    fun doExit() {
+        println("Exiting...")
+        metronome.stop()
+        metronome.close()
     }
 
     fun clamp(num: Float, min: Float, max: Float) : Float {

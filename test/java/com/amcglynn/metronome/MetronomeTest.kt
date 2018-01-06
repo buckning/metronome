@@ -94,7 +94,7 @@ class MetronomeTest : ClickListener {
         assertEquals(60f, metronome.tempo)
     }
 
-    override fun clickCountChanged() {
+    override fun clickCountChanged(newClickCount: Long) {
         clickListenerUpdated = true
     }
 }

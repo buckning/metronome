@@ -91,7 +91,7 @@ class Metronome(var tempo: Float, val sequencer: Sequencer, val sequence: Sequen
                 while(true) {
                     if(tickPosition != sequencer.tickPosition) {
                         tickPosition = sequencer.tickPosition
-                        clickListener?.clickCountChanged()
+                        clickListener?.clickCountChanged(tickPosition)
                     }
                     Thread.sleep(10)
                 }
