@@ -6,6 +6,7 @@ The metronome uses the javax.sound.midi APIs to generate the MIDI sounds
 # How to use
 
 While the metronome is running, available commands are:
+
 * start
 * stop
 * tempo <new tempo>
